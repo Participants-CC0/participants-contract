@@ -89,7 +89,13 @@ contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
         string memory currentBaseURI = _baseURI();
         return
             bytes(currentBaseURI).length > 0
-                ? string(abi.encodePacked(currentBaseURI, tokenId.toString()))
+                ? string(
+                    abi.encodePacked(
+                        currentBaseURI,
+                        tokenId.toString(),
+                        ".json"
+                    )
+                )
                 : "";
     }
 

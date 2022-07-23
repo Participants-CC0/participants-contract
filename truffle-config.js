@@ -5,7 +5,7 @@
  * them to suit your project as necessary.
  *
  * More information about configuration can be found at:
- * 
+ *
  * https://trufflesuite.com/docs/truffle/reference/configuration
  *
  * To deploy via Infura you'll need a wallet provider (like @truffle/hdwallet-provider)
@@ -33,14 +33,14 @@ module.exports = {
    *
    * $ truffle test --network <network-name>
    */
-  plugins: ['truffle-plugin-verify'],
+  plugins: ["truffle-plugin-verify"],
   api_keys: {
-    etherscan: 'CKQBCQSM8R9JSEHU5ZE6KYMBZ9J53I5RDJ',
+    etherscan: "CKQBCQSM8R9JSEHU5ZE6KYMBZ9J53I5RDJ",
   },
 
-  dashboard:{
+  dashboard: {
     port: 9000,
-    host: "localhost"
+    host: "localhost",
   },
 
   networks: {
@@ -51,13 +51,13 @@ module.exports = {
     // options below to some value.
     //
     development: {
-      host: "127.0.0.1",     // Localhost (default: none)
-      port: 7545,            // Standard Ethereum port (default: none)
-      network_id: 5777,       // Any network (default: none)
-     //  gas: 6721975,           // Gas sent with each transaction (default: ~6700000)
-      gasPrice: 80 * 10**9,  // 200 gwei (in wei) (default: 100 gwei)
-      from:"0xf3c636425380f74E1EdB826d7B7bB5a0BdA3F5CB" //admin
-     },
+      host: "127.0.0.1", // Localhost (default: none)
+      port: 7545, // Standard Ethereum port (default: none)
+      network_id: 5777, // Any network (default: none)
+      //  gas: 6721975,           // Gas sent with each transaction (default: ~6700000)
+      gasPrice: 80 * 10 ** 9, // 200 gwei (in wei) (default: 100 gwei)
+      from: "0xf3c636425380f74E1EdB826d7B7bB5a0BdA3F5CB", //admin
+    },
     //
     // An additional network, but with some advanced options…
     // advanced: {
@@ -96,16 +96,17 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.15",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.15", // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      settings: {          // See the solidity docs for advice about optimization and evmVersion
-       optimizer: {
-         enabled: true,
-         runs: 200
-       },
-      //  evmVersion: "byzantium"
-      }
-    }
+      settings: {
+        // See the solidity docs for advice about optimization and evmVersion
+        optimizer: {
+          enabled: true,
+          runs: 200,
+        },
+        //  evmVersion: "byzantium"
+      },
+    },
   },
 
   // Truffle DB is currently disabled by default; to enable it, change enabled:

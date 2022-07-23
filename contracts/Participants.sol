@@ -15,11 +15,9 @@ contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
     uint16 public constant MAX_SUPPLY = 3033;
     uint16 internal constant ROYALTY_BASE = 10000;
     uint16 internal constant ROYALTY_PERC = 1000;
-    uint256 internal constant ZERO_ETHER = 0.00 ether;
-    uint8 public constant MAX_PURCHASE_PER_TRANS = 1;
-    uint8 public constant MAX_TOKEN_PER_WALLET = 1;
 
     bool public isMintingActive = false;
+    bool public isReserved = false;
     string internal _baseTokenURI;
     address public participantsRoyaltyContract;
 
@@ -56,12 +54,14 @@ contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
         delete _totalSupply;
     }
 
-    function reserve(uint256 _amount) public onlyOwner {
-        require(_amount > 0);
+    function reserve() public onlyOwner {
+        require(!isReserved);
         uint256 _totalSupply = totalSupply();
+        uint256 _amount = 33;
         for (uint256 i = 0; i < _amount; ++i) {
             _safeMint(msg.sender, _totalSupply + i, "");
         }
+        isReserved = true;
     }
 
     function royaltyInfo(uint256, uint256 _salePrice)
@@ -103,7 +103,7 @@ contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
         _baseTokenURI = _newBaseURI;
     }
 
-    function setSaleStatus(bool _status) public onlyOwner {
+    function setMintingStatus(bool _status) public onlyOwner {
         isMintingActive = _status;
     }
 

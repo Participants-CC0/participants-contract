@@ -8,11 +8,18 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
 import "./ParticipantsRoyaltySplitter.sol";
+import "./interfaces/IParticipantsERC20Tokens.sol";
 
-contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
+contract Participants is
+    ERC721Enum,
+    Ownable,
+    ReentrancyGuard,
+    IERC2981,
+    IParticipantsERC20Tokens
+{
     using Strings for uint256;
 
-    uint16 public constant MAX_SUPPLY = 3033;
+    uint16 public constant MAX_SUPPLY = 3333;
     uint16 internal constant ROYALTY_BASE = 10000;
     uint16 internal constant ROYALTY_PERC = 1000;
 
@@ -20,6 +27,8 @@ contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
     bool public isReserved = false;
     string internal _baseTokenURI;
     address public participantsRoyaltyContract;
+
+    address[] internal _erc20Tokens;
 
     // bytes4(keccak256("royaltyInfo(uint256,uint256)")) == 0x2a55205a
     bytes4 private constant _INTERFACE_ID_ERC2981 = 0x2a55205a;
@@ -29,11 +38,13 @@ contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
         string memory _symbol,
         string memory _initBaseURI,
         address[] memory _recipients, //comm,mp,dd
-        uint256[] memory _splits
+        uint256[] memory _splits,
+        address[] memory _tokens
     ) ERC721P(_name, _symbol) {
         setBaseURI(_initBaseURI);
+        _erc20Tokens = _tokens;
         participantsRoyaltyContract = address(
-            new ParticipantsRoyaltySplitter(_recipients, _splits)
+            new ParticipantsRoyaltySplitter(_recipients, _splits, address(this))
         );
     }
 
@@ -119,10 +130,39 @@ contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
             super.supportsInterface(interfaceId);
     }
 
+    function setRoyaltyERC20Tokens(address[] calldata _tokens)
+        public
+        onlyOwner
+    {
+        _erc20Tokens = _tokens;
+    }
+
+    function getRoyaltyERC20Tokens()
+        public
+        view
+        returns (address[] memory tokens)
+    {
+        return _erc20Tokens;
+    }
+
     function withdraw() public payable onlyOwner {
+        for (uint256 index = 0; index < _erc20Tokens.length; index++) {
+            IERC20 token = IERC20(_erc20Tokens[index]);
+            uint256 balance = token.balanceOf(address(this));
+            if (balance > 0) {
+                bool success = token.transfer(
+                    payable(participantsRoyaltyContract),
+                    balance
+                );
+                require(success, "ERC20 Transfer failed.");
+            }
+        }
+
         (bool success, ) = payable(participantsRoyaltyContract).call{
             value: address(this).balance
         }("");
         require(success);
     }
+
+    receive() external payable {}
 }

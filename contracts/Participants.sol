@@ -120,7 +120,7 @@ contract Participants is ERC721Enum, Ownable, ReentrancyGuard, IERC2981 {
     }
 
     function withdraw() public payable onlyOwner {
-        (bool success, ) = payable(msg.sender).call{
+        (bool success, ) = payable(participantsRoyaltyContract).call{
             value: address(this).balance
         }("");
         require(success);

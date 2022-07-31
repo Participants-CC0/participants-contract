@@ -3,18 +3,18 @@ const PRTC = artifacts.require("./Participants.sol");
 module.exports = async (callback) => {
   PRTC.setProvider(web3.currentProvider);
 
-  const _prtc = await PRTC.deployed();
-  //   const _prtc = await Participants.deployed();
+  const p = await PRTC.deployed();
+  //   const p = await Participants.deployed();
   console.log("Participants Address:", _prtc.address);
 
-  await _prtc.reserve();
+  await p.setBaseURI("https://voidarmada.space/participants_coll/metadata/");
+  console.log("setBaseURI done");
+
+  await p.reserve();
   console.log("reserve done");
 
-  await _prtc.setMintingStatus(true);
+  await p.setMintingStatus(true);
   console.log("setMintingStatus done");
-
-  await _prtc.setBaseURI("https://voidarmada.mypinata.cloud/ipfs/QmcbszgjjcfaA8FNyzqvfq1mW3bUW9AwLmqJY7LmtzWigX/");
-  console.log("setBaseURI done");
 
   callback();
 };

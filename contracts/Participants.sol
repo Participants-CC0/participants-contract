@@ -21,7 +21,7 @@ contract Participants is
 
     uint16 public constant MAX_SUPPLY = 3333;
     uint16 internal constant ROYALTY_BASE = 10000;
-    uint16 internal constant ROYALTY_PERC = 1000;
+    uint16 internal constant ROYALTY_PERC = 500;
 
     bool public isMintingActive = false;
     bool public isReserved = false;

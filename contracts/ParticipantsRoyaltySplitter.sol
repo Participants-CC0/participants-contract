@@ -14,11 +14,8 @@ contract ParticipantsRoyaltySplitter is PaymentSplitter {
         uint256[] memory shares_,
         address prtcAddress
     ) PaymentSplitter(payees, shares_) {
-        require(
-            payees.length == shares_.length,
-            "PaymentSplitter: payees and shares length mismatch"
-        );
-        require(payees.length > 0, "PaymentSplitter: no payees");
+        require(payees.length == shares_.length, "LengthMismatch");
+        require(payees.length > 0, "NoPayees");
 
         _payeesCount = payees.length;
         _erc20TokensInterface = IParticipantsERC20Tokens(prtcAddress);

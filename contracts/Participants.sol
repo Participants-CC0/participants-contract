@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
-// Author: Modern People; Developed by Modern People, 2022
+// Author: Participants; Developed by Modern People, 2022
+
 pragma solidity ^0.8.12;
 import "./extensions/ERC721Enum.sol";
 import "@openzeppelin/contracts/interfaces/IERC2981.sol";
@@ -19,9 +20,9 @@ contract Participants is
 {
     using Strings for uint256;
 
-    uint16 public constant MAX_SUPPLY = 3333;
-    uint16 internal constant ROYALTY_BASE = 10000;
-    uint16 internal constant ROYALTY_PERC = 500;
+    uint256 public constant MAX_SUPPLY = 3333;
+    uint256 internal constant ROYALTY_BASE = 10000;
+    uint256 internal constant ROYALTY_PERC = 500;
 
     bool public isMintingActive = false;
     bool public isReserved = false;
@@ -54,19 +55,19 @@ contract Participants is
     }
 
     // public minting
-    function mint() public nonReentrant {
-        require(isMintingActive, "Minting not active.");
-        require(balanceOf(msg.sender) == 0, "Token amount exceeds per wallet.");
+    function mint() external {
+        require(isMintingActive, "MintingNotActive");
+        require(balanceOf(msg.sender) == 0, "OnePerWallet.");
 
         uint256 _totalSupply = totalSupply();
         require(_totalSupply + 1 <= MAX_SUPPLY, "Sold Out");
 
-        _safeMint(msg.sender, _totalSupply + 1, "");
+        _mint(msg.sender, _totalSupply + 1);
         delete _totalSupply;
     }
 
-    function reserve() public onlyOwner {
-        require(!isReserved);
+    function reserve() external onlyOwner {
+        require(!isReserved, "AlreadyReserved");
         uint256 _totalSupply = totalSupply();
         uint256 _amount = 33;
         for (uint256 i = 0; i < _amount; ++i) {
@@ -96,7 +97,7 @@ contract Participants is
         override
         returns (string memory)
     {
-        require(_exists(tokenId), "ERC721Metadata: Nonexistent token");
+        require(_exists(tokenId), "NonexistentToken");
         string memory currentBaseURI = _baseURI();
         return
             bytes(currentBaseURI).length > 0
@@ -114,7 +115,7 @@ contract Participants is
         _baseTokenURI = _newBaseURI;
     }
 
-    function setMintingStatus(bool _status) public onlyOwner {
+    function setMintingStatus(bool _status) external onlyOwner {
         isMintingActive = _status;
     }
 
@@ -145,7 +146,7 @@ contract Participants is
         return _erc20Tokens;
     }
 
-    function withdraw() public payable onlyOwner {
+    function withdraw() external payable {
         for (uint256 index = 0; index < _erc20Tokens.length; index++) {
             IERC20 token = IERC20(_erc20Tokens[index]);
             uint256 balance = token.balanceOf(address(this));
@@ -154,14 +155,14 @@ contract Participants is
                     payable(participantsRoyaltyContract),
                     balance
                 );
-                require(_success, "ERC20 Transfer failed.");
+                require(_success, "ERC20TransferFailed.");
             }
         }
 
         (bool success, ) = payable(participantsRoyaltyContract).call{
             value: address(this).balance
         }("");
-        require(success);
+        require(success, "ETHTransferFailed");
     }
 
     receive() external payable {}

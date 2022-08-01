@@ -14,8 +14,8 @@ const Participants = artifacts.require("Participants");
 // var _CommRecipient = "0x0781c0E18A254ce26a385B5777A3D8dB3beb9109";
 var _MPRecipient = "0xe7F7001CDAD37ff79e79617d9219296C23270080";
 var _DDRecipient = "0x059f0F7A644a813F2C716E64F3eD23fA0E8e3d6D";
-var _name = "PRTC_10";
-var _symbol = "PRTC_10";
+var _name = "PRTC_11";
+var _symbol = "PRTC_11";
 var tokens = ["0xc778417E063141139Fce010982780140Aa0cD5Ab"]; //rinkeby wETH
 
 // local
@@ -26,7 +26,7 @@ var tokens = ["0xc778417E063141139Fce010982780140Aa0cD5Ab"]; //rinkeby wETH
 // var _symbol = "PRTC_1";
 // var tokens = [];
 
-var _recipients = [_CommRecipient, _DDRecipient];
+var _recipients = [_MPRecipient, _DDRecipient];
 var _royaltySplits = [8000, 2000]; //over 5%
 
 var baseTokenURI = "";

@@ -7,7 +7,7 @@ module.exports = async (callback) => {
   //   const p = await Participants.deployed();
   console.log("Participants Address:", _prtc.address);
 
-  await p.setBaseURI("https://voidarmada.space/participants_coll/metadata/");
+  await p.setBaseURI("https://participants.mypinata.cloud/ipfs/QmXKwGdR84GYX7R78wycV8WGannbMuMyFV7i8SugsQnG4A/");
   console.log("setBaseURI done");
 
   await p.reserve();

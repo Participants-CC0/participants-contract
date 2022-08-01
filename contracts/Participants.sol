@@ -150,11 +150,11 @@ contract Participants is
             IERC20 token = IERC20(_erc20Tokens[index]);
             uint256 balance = token.balanceOf(address(this));
             if (balance > 0) {
-                bool success = token.transfer(
+                bool _success = token.transfer(
                     payable(participantsRoyaltyContract),
                     balance
                 );
-                require(success, "ERC20 Transfer failed.");
+                require(_success, "ERC20 Transfer failed.");
             }
         }
 

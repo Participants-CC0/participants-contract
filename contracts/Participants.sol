@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-3.0
-// Author: Participants; Developed by Modern People, 2022
+// Author: Participants
 
 pragma solidity ^0.8.12;
-import "./extensions/ERC721Enum.sol";
-import "@openzeppelin/contracts/interfaces/IERC2981.sol";
+// import "./extensions/ERC721Enum.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -12,7 +12,7 @@ import "./ParticipantsRoyaltySplitter.sol";
 import "./interfaces/IParticipantsERC20Tokens.sol";
 
 contract Participants is
-    ERC721Enum,
+    ERC721Enumerable,
     Ownable,
     ReentrancyGuard,
     IERC2981,
@@ -25,7 +25,7 @@ contract Participants is
     uint256 internal constant ROYALTY_PERC = 500;
 
     bool public isMintingActive = false;
-    bool public isReserved = false;
+    bool internal isReserved = false;
     string internal _baseTokenURI;
     address public participantsRoyaltyContract;
 
@@ -38,10 +38,10 @@ contract Participants is
         string memory _name,
         string memory _symbol,
         string memory _initBaseURI,
-        address[] memory _recipients, //comm,mp,dd
+        address[] memory _recipients, //mp,dd
         uint256[] memory _splits,
         address[] memory _tokens
-    ) ERC721P(_name, _symbol) {
+    ) ERC721(_name, _symbol) {
         setBaseURI(_initBaseURI);
         _erc20Tokens = _tokens;
         participantsRoyaltyContract = address(
@@ -50,7 +50,7 @@ contract Participants is
     }
 
     // internal
-    function _baseURI() internal view virtual returns (string memory) {
+    function _baseURI() internal view override(ERC721) returns (string memory) {
         return _baseTokenURI;
     }
 
@@ -58,22 +58,29 @@ contract Participants is
     function mint() external {
         require(isMintingActive, "MintingNotActive");
         require(balanceOf(msg.sender) == 0, "OnePerWallet.");
-
         uint256 _totalSupply = totalSupply();
         require(_totalSupply + 1 <= MAX_SUPPLY, "Sold Out");
-
         _mint(msg.sender, _totalSupply + 1);
-        delete _totalSupply;
     }
 
     function reserve() external onlyOwner {
-        require(!isReserved, "AlreadyReserved");
+        require(isReserved == false, "AlreadyReserved");
         uint256 _totalSupply = totalSupply();
         uint256 _amount = 33;
         for (uint256 i = 0; i < _amount; ++i) {
-            _safeMint(msg.sender, _totalSupply + i, "");
+            _mint(msg.sender, _totalSupply + 1);
+            _totalSupply += 1;
         }
-        isReserved = true;
+    }
+
+    function gift(address[] calldata recipient) external onlyOwner {
+        require(recipient.length > 0, "ZeroRecipients");
+        uint256 _s = totalSupply();
+
+        for (uint256 i = 0; i < recipient.length; ++i) {
+            _mint(recipient[i], _s + 1);
+            _s += 1;
+        }
     }
 
     function royaltyInfo(uint256, uint256 _salePrice)
@@ -123,7 +130,7 @@ contract Participants is
         public
         view
         virtual
-        override(ERC721Enum, IERC165)
+        override(ERC721Enumerable, IERC165)
         returns (bool)
     {
         return

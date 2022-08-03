@@ -2,8 +2,7 @@
 // Author: Participants
 
 pragma solidity ^0.8.12;
-// import "./extensions/ERC721Enum.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "erc721a/contracts/ERC721A.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
@@ -12,7 +11,7 @@ import "./ParticipantsRoyaltySplitter.sol";
 import "./interfaces/IParticipantsERC20Tokens.sol";
 
 contract Participants is
-    ERC721Enumerable,
+    ERC721A,
     Ownable,
     ReentrancyGuard,
     IERC2981,
@@ -41,7 +40,7 @@ contract Participants is
         address[] memory _recipients, //mp,dd
         uint256[] memory _splits,
         address[] memory _tokens
-    ) ERC721(_name, _symbol) {
+    ) ERC721A(_name, _symbol) {
         setBaseURI(_initBaseURI);
         _erc20Tokens = _tokens;
         participantsRoyaltyContract = address(
@@ -50,7 +49,12 @@ contract Participants is
     }
 
     // internal
-    function _baseURI() internal view override(ERC721) returns (string memory) {
+    function _baseURI()
+        internal
+        view
+        override(ERC721A)
+        returns (string memory)
+    {
         return _baseTokenURI;
     }
 
@@ -60,26 +64,19 @@ contract Participants is
         require(balanceOf(msg.sender) == 0, "OnePerWallet.");
         uint256 _totalSupply = totalSupply();
         require(_totalSupply + 1 <= MAX_SUPPLY, "Sold Out");
-        _mint(msg.sender, _totalSupply + 1);
+        _mint(msg.sender, 1);
     }
 
     function reserve() external onlyOwner {
         require(isReserved == false, "AlreadyReserved");
-        uint256 _totalSupply = totalSupply();
-        uint256 _amount = 33;
-        for (uint256 i = 0; i < _amount; ++i) {
-            _mint(msg.sender, _totalSupply + 1);
-            _totalSupply += 1;
-        }
+        require(totalSupply() + 1 <= MAX_SUPPLY, "Sold Out");
+        _mint(msg.sender, 33);
     }
 
     function gift(address[] calldata recipient) external onlyOwner {
         require(recipient.length > 0, "ZeroRecipients");
-        uint256 _s = totalSupply();
-
         for (uint256 i = 0; i < recipient.length; ++i) {
-            _mint(recipient[i], _s + 1);
-            _s += 1;
+            _mint(recipient[i], 1);
         }
     }
 
@@ -130,7 +127,7 @@ contract Participants is
         public
         view
         virtual
-        override(ERC721Enumerable, IERC165)
+        override(ERC721A, IERC165)
         returns (bool)
     {
         return
